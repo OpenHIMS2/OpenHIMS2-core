@@ -33,7 +33,7 @@ A free, open-source Health Information Management System built with **Laravel 10
 
 ## Features
 
-- Multi-clinic, multi-institution hierarchy management
+- Multi-clinic, multi-institution hierarchy
 - Role-based access: Admin and Clinical staff
 - Patient registration with duplicate detection (NIC / mobile)
 - Queue management per clinic per day
@@ -152,9 +152,9 @@ Password: password
 Institutions represent your physical locations. They support a **parent-child hierarchy**:
 
 ```
-Ministry of Health            ← top-level institution
-  └─ Central Province         ← child
-       └─ GMC Akurana         ← leaf (where units live)
+National Department of Health       ← top-level institution
+  └─ Northern Regional Authority    ← child
+       └─ St. George's Hospital     ← leaf (where units live)
 ```
 
 Fields:
@@ -164,7 +164,6 @@ Fields:
 - Email, phone, address (optional)
 
 You can nest as many levels as needed. Only institutions at the lowest level (leaves) should have units attached.
-[![Screenshot-2026-04-21-125909.png](https://i.postimg.cc/Vvk1XRYb/Screenshot-2026-04-21-125909.png)](https://postimg.cc/0MFLs7K8)
 
 ---
 
@@ -175,7 +174,7 @@ You can nest as many levels as needed. Only institutions at the lowest level (le
 A **Unit** is a physical clinic room/ward within an institution. Each unit is typed by a **Unit Template** (e.g., GMC, DC, GP).
 
 Fields:
-- **Unit Name** — e.g., `GMC Akurana`
+- **Unit Name** — e.g., `City General Clinic`
 - **Unit Number** — optional identifier
 - **Institution** — which institution this unit belongs to
 - **Unit Template** — the clinic type (see table below)
@@ -188,7 +187,6 @@ Fields:
 | General Pharmacy | GP | Pharmacy dispensing |
 | Office | OFFICE | Admin / staff |
 
-[![Screenshot-2026-04-21-125945.png](https://i.postimg.cc/mkgR7wbs/Screenshot-2026-04-21-125945.png)](https://postimg.cc/DJHtT1Jj)
 ---
 
 ### 3. Create Unit Views
@@ -197,14 +195,14 @@ Fields:
 
 A **Unit View** is an instance of a role-view at a specific unit. It is the access-control bridge between a user and a unit.
 
-Example: "GMC Akurana - Doctor View" is a UnitView that combines:
-- Unit: `GMC Akurana`
+Example: "City General Clinic - Doctor View" is a UnitView that combines:
+- Unit: `City General Clinic`
 - View Template: `GMC - Doctor View`
 
 **Steps:**
 1. Select the Unit
 2. Select the View Template (role-based view for that unit type)
-3. Give it a name (e.g., `GMC Akurana — Doctor`)
+3. Give it a name (e.g., `City General Clinic — Doctor`)
 4. Save
 
 Available View Templates per Unit Template:
@@ -216,8 +214,6 @@ Available View Templates per Unit Template:
 | GI | Doctor View, Clerk View, Nurse View |
 | GP | Doctor View, Pharmacist View, Clerk View |
 | OFFICE | Doctor View, Nurse View, Clerk View |
-
-[![Screenshot-2026-04-21-125959.png](https://i.postimg.cc/hvtgVrSq/Screenshot-2026-04-21-125959.png)](https://postimg.cc/ph4gHKh0)
 
 ---
 
@@ -240,8 +236,6 @@ Fields:
 - Admin role → always goes to `/admin/dashboard`
 
 **AJAX-driven form:** When you pick an Institution, the Units dropdown loads automatically. When you pick Units, the Views checkboxes load automatically.
-
-[![Screenshot-2026-04-21-140951.png](https://i.postimg.cc/L6RYqKKR/Screenshot-2026-04-21-140951.png)](https://postimg.cc/fk2TFPRg)
 
 ---
 
@@ -266,12 +260,6 @@ After adding a drug, click **Set Default** to pre-fill prescribing defaults:
 | Duration | Number of days |
 
 When a doctor searches for this drug during a visit, these defaults auto-fill the prescription form.
-
-[![Screenshot-2026-04-21-130023.png](https://i.postimg.cc/j5XtW9YG/Screenshot-2026-04-21-130023.png)](https://postimg.cc/phpg4sTZ)
-
-[![Screenshot-2026-04-21-130033.png](https://i.postimg.cc/C1NSZtVp/Screenshot-2026-04-21-130033.png)](https://postimg.cc/MMvhN9T9)
-
-
 
 ---
 
@@ -305,10 +293,6 @@ Terminology terms are grouped into **19 medical categories** used for autocomple
 
 Click **Add Term** next to a category, type the term, and save. Terms appear as autocomplete suggestions when clinical staff type in those fields.
 
-[![Screenshot-2026-04-21-130050.png](https://i.postimg.cc/wvVgtPdp/Screenshot-2026-04-21-130050.png)](https://postimg.cc/8Jjq9Z5K)
-
-
-
 ---
 
 ## Daily Clinical Use
@@ -326,13 +310,6 @@ The **Clerk View** is the front-desk interface for patient registration and queu
    - **Urgent** — priority case
 3. **Monitor queue**: The queue panel shows all patients waiting, in-progress, and visited today.
 4. **Reset queue**: At end of day, use `Reset Queue` to archive the session and start fresh the next day.
-
-[![Screenshot-2026-04-21-125150.png](https://i.postimg.cc/9FzCMJ8G/Screenshot-2026-04-21-125150.png)](https://postimg.cc/D8VtpdKZ)
-
-[![Screenshot-2026-04-21-125209.png](https://i.postimg.cc/sfT3stc9/Screenshot-2026-04-21-125209.png)](https://postimg.cc/WtqB7Yxh)
-
-[![Screenshot-2026-04-21-125259.png](https://i.postimg.cc/wxw9gSVv/Screenshot-2026-04-21-125259.png)](https://postimg.cc/t7nKzv8Q)
-
 
 ---
 
@@ -356,25 +333,6 @@ The **Doctor View** shows today's queue and opens a full visit form when a patie
    - Full audit log of additions, edits, and deletions
 10. **Management Instructions**: Free-text plus autocomplete for standard instruction bundles (diabetes, hypertension, etc.).
 11. **End Visit**: Click `End Visit` to mark the patient as visited and move them to the pharmacist queue.
-
-[![Screenshot-2026-04-21-125124.png](https://i.postimg.cc/zX38B0tC/Screenshot-2026-04-21-125124.png)](https://postimg.cc/gn9ftqPj)
-
-[![Screenshot-2026-04-21-125236.png](https://i.postimg.cc/7PKqwpVf/Screenshot-2026-04-21-125236.png)](https://postimg.cc/xqNwPpB2)
-
-[![Screenshot-2026-04-21-125339.png](https://i.postimg.cc/RCgv4jRZ/Screenshot-2026-04-21-125339.png)](https://postimg.cc/NL23xCS3)
-
-[![Screenshot-2026-04-21-125418.png](https://i.postimg.cc/gjtpsZJM/Screenshot-2026-04-21-125418.png)](https://postimg.cc/zHh4X3TW)
-
-[![Screenshot-2026-04-21-125433.png](https://i.postimg.cc/cCkWhnH5/Screenshot-2026-04-21-125433.png)](https://postimg.cc/zHh4X3Tn)
-
-[![Screenshot-2026-04-21-125453.png](https://i.postimg.cc/C5r07q1J/Screenshot-2026-04-21-125453.png)](https://postimg.cc/wRNnT3Ds)
-
-[![Screenshot-2026-04-21-125536.png](https://i.postimg.cc/nrSx2DzS/Screenshot-2026-04-21-125536.png)](https://postimg.cc/PvD0rN11)
-
-[![Screenshot-2026-04-21-125637.png](https://i.postimg.cc/nrSx2DzK/Screenshot-2026-04-21-125637.png)](https://postimg.cc/rR47Fz5z)
-
-
-
 
 ---
 
@@ -401,8 +359,6 @@ The **Pharmacist View** (GP units only) handles dispensing and stock management.
 3. For each prescribed drug, click `Dispense` → select a matching stock item → enter quantity dispensed
 4. Mark the visit as `Dispensed` when all drugs have been handled
 
-   [![Screenshot-2026-04-21-125743.png](https://i.postimg.cc/x8pQ5zCH/Screenshot-2026-04-21-125743.png)](https://postimg.cc/kRSLXDWX)
-
 #### Stock Management
 
 Within the Pharmacist view:
@@ -416,8 +372,6 @@ Within the Pharmacist view:
 - Drugs expiring within 30 days
 - Drugs below the low-stock threshold
 - Drugs marked as out of stock
-
-  [![Screenshot-2026-04-21-125804.png](https://i.postimg.cc/HnvmzyxL/Screenshot-2026-04-21-125804.png)](https://postimg.cc/RJt2Vqwr)
 
 ---
 
