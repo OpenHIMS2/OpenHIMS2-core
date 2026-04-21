@@ -33,7 +33,7 @@ A free, open-source Health Information Management System built with **Laravel 10
 
 ## Features
 
-- Multi-clinic, multi-institution hierarchy
+- Multi-clinic, multi-institution hierarchy management
 - Role-based access: Admin and Clinical staff
 - Patient registration with duplicate detection (NIC / mobile)
 - Queue management per clinic per day
