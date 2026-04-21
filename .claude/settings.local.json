@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /H/xampp/htdocs/PHIMS log --oneline -20)",
+      "Bash(npm install:*)",
+      "Bash(php artisan:*)",
+      "Bash(php -r:*)",
+      "Bash(curl:*)",
+      "Bash(powershell:*)",
+      "Bash(grep -n \"stack.*scripts\\\\|push.*scripts\" H:/xampp/htdocs/PHIMS/resources/views/layouts/*.blade.php)",
+      "Bash(find H:/xampp/htdocs/PHIMS/database/migrations -type f -name *visit* -o -name *investigation* -o -name *visit_drug*)",
+      "Bash(ls:*)",
+      "Read(//h/xampp/logs/**)",
+      "Read(//h/xampp/apache/logs/**)",
+      "Bash(find . -type f -name *[Mm]iddle* -path */app/Http/Middleware/*)",
+      "Bash(php -l app/Http/Controllers/ProfileController.php)",
+      "Bash(grep -l \"visit_drugs\\\\|drug_names\\\\|drug_name_defaults\\\\|visit_drug_changes\" H:/xampp/htdocs/PHIMS/database/migrations/*)",
+      "Bash(grep:*)",
+      "Bash(php:*)",
+      "Bash(find H:\\\\xampp\\\\htdocs\\\\PHIMS\\\\app\\\\Http\\\\Controllers\\\\Admin:*)",
+      "Bash(/h/xampp/mysql/bin/mysqldump --no-data -u PHIMS -p123 phims)",
+      "Bash(/h/xampp/mysql/bin/mysqldump -u PHIMS -p123 phims unit_templates view_templates)"
+    ]
+  }
+}
