@@ -165,6 +165,8 @@ Fields:
 
 You can nest as many levels as needed. Only institutions at the lowest level (leaves) should have units attached.
 
+[![Screenshot-2026-04-21-224603.png](https://i.postimg.cc/XNQV6Zj2/Screenshot-2026-04-21-224603.png)](https://postimg.cc/BtPWxn1D)
+
 ---
 
 ### 2. Create Units
@@ -187,6 +189,8 @@ Fields:
 | General Pharmacy | GP | Pharmacy dispensing |
 | Office | OFFICE | Admin / staff |
 
+
+[![Screenshot-2026-04-21-224710.png](https://i.postimg.cc/L4NHFq9x/Screenshot-2026-04-21-224710.png)](https://postimg.cc/Lhgdz8ZP)
 ---
 
 ### 3. Create Unit Views
@@ -215,6 +219,8 @@ Available View Templates per Unit Template:
 | GP | Doctor View, Pharmacist View, Clerk View |
 | OFFICE | Doctor View, Nurse View, Clerk View |
 
+
+[![Screenshot-2026-04-21-224729.png](https://i.postimg.cc/7PmxrCHm/Screenshot-2026-04-21-224729.png)](https://postimg.cc/6T4sdpGv)
 ---
 
 ### 4. Create Users & Assign Views
@@ -236,6 +242,8 @@ Fields:
 - Admin role → always goes to `/admin/dashboard`
 
 **AJAX-driven form:** When you pick an Institution, the Units dropdown loads automatically. When you pick Units, the Views checkboxes load automatically.
+
+[![Screenshot-2026-04-21-224805.png](https://i.postimg.cc/pVq2M9WK/Screenshot-2026-04-21-224805.png)](https://postimg.cc/Th58r3WP)
 
 ---
 
@@ -260,6 +268,10 @@ After adding a drug, click **Set Default** to pre-fill prescribing defaults:
 | Duration | Number of days |
 
 When a doctor searches for this drug during a visit, these defaults auto-fill the prescription form.
+
+[![Screenshot-2026-04-21-224827.png](https://i.postimg.cc/pVq2M9W8/Screenshot-2026-04-21-224827.png)](https://postimg.cc/MXfkypjK)
+
+[![Screenshot-2026-04-21-224854.png](https://i.postimg.cc/59nxWH4L/Screenshot-2026-04-21-224854.png)](https://postimg.cc/dDZM8VTV)
 
 ---
 
@@ -293,6 +305,8 @@ Terminology terms are grouped into **19 medical categories** used for autocomple
 
 Click **Add Term** next to a category, type the term, and save. Terms appear as autocomplete suggestions when clinical staff type in those fields.
 
+[![Screenshot-2026-04-21-224918.png](https://i.postimg.cc/wx06Ytq5/Screenshot-2026-04-21-224918.png)](https://postimg.cc/Z0vkr5y0)
+
 ---
 
 ## Daily Clinical Use
@@ -310,6 +324,12 @@ The **Clerk View** is the front-desk interface for patient registration and queu
    - **Urgent** — priority case
 3. **Monitor queue**: The queue panel shows all patients waiting, in-progress, and visited today.
 4. **Reset queue**: At end of day, use `Reset Queue` to archive the session and start fresh the next day.
+
+   [![Screenshot-2026-04-21-222812.png](https://i.postimg.cc/65qBW9T9/Screenshot-2026-04-21-222812.png)](https://postimg.cc/mhvvVWQq)
+
+   [![Screenshot-2026-04-21-222844.png](https://i.postimg.cc/pXrPW2yN/Screenshot-2026-04-21-222844.png)](https://postimg.cc/jCppvYzv)
+
+   [![Screenshot-2026-04-21-223813.png](https://i.postimg.cc/bNrqyzr7/Screenshot-2026-04-21-223813.png)](https://postimg.cc/Cd33Jpj7)
 
 ---
 
@@ -333,6 +353,18 @@ The **Doctor View** shows today's queue and opens a full visit form when a patie
    - Full audit log of additions, edits, and deletions
 10. **Management Instructions**: Free-text plus autocomplete for standard instruction bundles (diabetes, hypertension, etc.).
 11. **End Visit**: Click `End Visit` to mark the patient as visited and move them to the pharmacist queue.
+
+    [![Screenshot-2026-04-21-223849.png](https://i.postimg.cc/c4CdxsCV/Screenshot-2026-04-21-223849.png)](https://postimg.cc/Hjqq31Q2)
+
+    [![Screenshot-2026-04-21-224008.png](https://i.postimg.cc/3JN38KNb/Screenshot-2026-04-21-224008.png)](https://postimg.cc/9z661HGG)
+
+    [![Screenshot-2026-04-21-224120.png](https://i.postimg.cc/HsnTYpn6/Screenshot-2026-04-21-224120.png)](https://postimg.cc/23ssTN4W)
+
+    [![Screenshot-2026-04-21-224244.png](https://i.postimg.cc/xT89f08s/Screenshot-2026-04-21-224244.png)](https://postimg.cc/fkGG5QxX)
+
+    [![Screenshot-2026-04-21-224323.png](https://i.postimg.cc/zXvqzJvk/Screenshot-2026-04-21-224323.png)](https://postimg.cc/Dm9953qW)
+
+    [![Screenshot-2026-04-21-224403.png](https://i.postimg.cc/Fszhr9zV/Screenshot-2026-04-21-224403.png)](https://postimg.cc/XXRRx6wr)
 
 ---
 
@@ -372,6 +404,12 @@ Within the Pharmacist view:
 - Drugs expiring within 30 days
 - Drugs below the low-stock threshold
 - Drugs marked as out of stock
+
+  [![Screenshot-2026-04-21-224434.png](https://i.postimg.cc/pXrPW2rQ/Screenshot-2026-04-21-224434.png)](https://postimg.cc/9z661HGz)
+
+  [![Screenshot-2026-04-21-224508.png](https://i.postimg.cc/hPvKDSvL/Screenshot-2026-04-21-224508.png)](https://postimg.cc/WtBBScMz)
+
+  [![Screenshot-2026-04-21-224520.png](https://i.postimg.cc/59nxWH47/Screenshot-2026-04-21-224520.png)](https://postimg.cc/nM98vhQB)
 
 ---
 
