@@ -164,6 +164,7 @@ Fields:
 - Email, phone, address (optional)
 
 You can nest as many levels as needed. Only institutions at the lowest level (leaves) should have units attached.
+[Screenshot-2026-04-21-125909.png](https://postimg.cc/0MFLs7K8)
 
 ---
 
