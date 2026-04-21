@@ -241,6 +241,8 @@ Fields:
 
 **AJAX-driven form:** When you pick an Institution, the Units dropdown loads automatically. When you pick Units, the Views checkboxes load automatically.
 
+[![Screenshot-2026-04-21-140951.png](https://i.postimg.cc/L6RYqKKR/Screenshot-2026-04-21-140951.png)](https://postimg.cc/fk2TFPRg)
+
 ---
 
 ### 5. Manage Drugs & Defaults
