@@ -364,7 +364,7 @@ The **Doctor View** shows today's queue and opens a full visit form when a patie
 
     [![Screenshot-2026-04-21-224323.png](https://i.postimg.cc/zXvqzJvk/Screenshot-2026-04-21-224323.png)](https://postimg.cc/Dm9953qW)
 
-    [![Screenshot-2026-04-21-224403.png](https://i.postimg.cc/Fszhr9zV/Screenshot-2026-04-21-224403.png)](https://postimg.cc/XXRRx6wr)
+    [![Screenshot-2026-04-21-230631.png](https://i.postimg.cc/SsQxccQk/Screenshot-2026-04-21-230631.png)](https://postimg.cc/cKjWSg8b)
 
 ---
 
