@@ -38,9 +38,15 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     // Hierarchy management
     Route::resource('hierarchy', HierarchyController::class)->only(['index', 'store', 'update', 'destroy']);
 
-    // Static template lists (read-only)
-    Route::get('unit-templates', [UnitTemplateController::class, 'index'])->name('unit-templates.index');
-    Route::get('view-templates', [ViewTemplateController::class, 'index'])->name('view-templates.index');
+    // Unit Templates — system entries are read-only; custom ones support add/delete
+    Route::get('unit-templates',                    [UnitTemplateController::class, 'index'])  ->name('unit-templates.index');
+    Route::post('unit-templates',                   [UnitTemplateController::class, 'store'])  ->name('unit-templates.store');
+    Route::delete('unit-templates/{unitTemplate}',  [UnitTemplateController::class, 'destroy'])->name('unit-templates.destroy');
+
+    // View Templates — system entries are read-only; custom ones support add/delete
+    Route::get('view-templates',                    [ViewTemplateController::class, 'index'])  ->name('view-templates.index');
+    Route::post('view-templates',                   [ViewTemplateController::class, 'store'])  ->name('view-templates.store');
+    Route::delete('view-templates/{viewTemplate}',  [ViewTemplateController::class, 'destroy'])->name('view-templates.destroy');
 
     // Units management
     Route::get('units',            [UnitManagementController::class, 'index'])  ->name('units.index');
@@ -61,9 +67,11 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     Route::resource('users', UserManagementController::class)->except(['show']);
 
     // Terminology management
-    Route::get('terminology',                          [TerminologyController::class, 'index'])  ->name('terminology.index');
-    Route::post('terminology',                         [TerminologyController::class, 'store'])  ->name('terminology.store');
-    Route::delete('terminology/{terminologyTerm}',     [TerminologyController::class, 'destroy'])->name('terminology.destroy');
+    Route::get('terminology',                                        [TerminologyController::class, 'index'])          ->name('terminology.index');
+    Route::post('terminology',                                       [TerminologyController::class, 'store'])          ->name('terminology.store');
+    Route::delete('terminology/{terminologyTerm}',                   [TerminologyController::class, 'destroy'])        ->name('terminology.destroy');
+    Route::post('terminology/categories',                            [TerminologyController::class, 'storeCategory'])  ->name('terminology.categories.store');
+    Route::delete('terminology/categories/{terminologyCategory}',    [TerminologyController::class, 'destroyCategory'])->name('terminology.categories.destroy');
 
     // Drugs management — specific routes BEFORE wildcard {drug} / {drugDefault}
     Route::post('drugs/defaults',                      [DrugManagementController::class, 'storeDefault'])   ->name('drugs.defaults.store');

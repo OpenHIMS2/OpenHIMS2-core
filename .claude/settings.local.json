@@ -19,7 +19,12 @@
       "Bash(php:*)",
       "Bash(find H:\\\\xampp\\\\htdocs\\\\PHIMS\\\\app\\\\Http\\\\Controllers\\\\Admin:*)",
       "Bash(/h/xampp/mysql/bin/mysqldump --no-data -u PHIMS -p123 phims)",
-      "Bash(/h/xampp/mysql/bin/mysqldump -u PHIMS -p123 phims unit_templates view_templates)"
+      "Bash(/h/xampp/mysql/bin/mysqldump -u PHIMS -p123 phims unit_templates view_templates)",
+      "Read(//c/xampp/mysql/**)",
+      "Read(//d/xampp/mysql/bin/**)",
+      "Bash(where mysqldump *)",
+      "Bash(2>&1)",
+      "Bash(/c/xampp/mysql/bin/mysqldump -u root --no-tablespaces phims)"
     ]
   }
 }

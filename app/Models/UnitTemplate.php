@@ -9,7 +9,9 @@ class UnitTemplate extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'code'];
+    protected $fillable = ['name', 'code', 'is_system'];
+
+    protected $casts = ['is_system' => 'boolean'];
 
     public function viewTemplates()
     {

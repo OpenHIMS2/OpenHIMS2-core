@@ -1,6 +1,6 @@
 # OpenHIMS2 — Open Health Information Management System
 
-A free, open-source Health Information Management System built with **Laravel 10** and **MySQL**. Designed for multi-clinic hospital networks, it supports patient registration, clinical workflows (Doctor → Nurse → Pharmacist), drug prescriptions, pharmacy stock management, and medical terminology autocomplete.
+A free, open-source Health Information Management System built with **Laravel 10** and **MySQL**. Designed for multi-clinic hospital networks, it supports patient registration, clinical workflows (Doctor → Nurse → Pharmacist), drug prescriptions, pharmacy stock management, medical terminology autocomplete, and a fully dynamic clinical page builder.
 
 ---
 
@@ -10,24 +10,23 @@ A free, open-source Health Information Management System built with **Laravel 10
 2. [Requirements](#requirements)
 3. [Installation](#installation)
 4. [First-Time Setup (Admin)](#first-time-setup-admin)
-   - [Create Institutions](#1-create-institutions)
-   - [Create Units](#2-create-units)
-   - [Create Unit Views](#3-create-unit-views)
-   - [Create Users & Assign Views](#4-create-users--assign-views)
-   - [Manage Drugs & Defaults](#5-manage-drugs--defaults)
-   - [Manage Terminology](#6-manage-terminology)
+   - [1. Create Institutions](#1-create-institutions)
+   - [2. Create Units](#2-create-units)
+   - [3. Create Unit Views](#3-create-unit-views)
+   - [4. Create Users & Assign Views](#4-create-users--assign-views)
+   - [5. Manage Drugs & Defaults](#5-manage-drugs--defaults)
+   - [6. Manage Terminology](#6-manage-terminology)
 5. [Daily Clinical Use](#daily-clinical-use)
    - [Clerk Workflow](#clerk-workflow)
    - [Doctor Workflow](#doctor-workflow)
    - [Nurse Workflow](#nurse-workflow)
    - [Pharmacist Workflow](#pharmacist-workflow)
-6. [Advanced: Adding New Unit Templates](#advanced-adding-new-unit-templates)
-7. [Advanced: Adding New View Templates](#advanced-adding-new-view-templates)
-8. [Advanced: Creating New Clinical View Pages](#advanced-creating-new-clinical-view-pages)
-9. [Advanced: Adding New Terminology Categories](#advanced-adding-new-terminology-categories)
-10. [Advanced: Using Terminology in Blade Views](#advanced-using-terminology-in-blade-views)
-11. [Database Schema](#database-schema)
-12. [License](#license)
+6. [Advanced: Custom Unit Templates](#advanced-custom-unit-templates)
+7. [Advanced: Custom View Templates & Clinical Pages](#advanced-custom-view-templates--clinical-pages)
+8. [Advanced: Custom Terminology Boxes](#advanced-custom-terminology-boxes)
+9. [Advanced: Using Terminology in Blade Views](#advanced-using-terminology-in-blade-views)
+10. [Database Schema](#database-schema)
+11. [License](#license)
 
 ---
 
@@ -40,7 +39,10 @@ A free, open-source Health Information Management System built with **Laravel 10
 - Doctor visit notes: complaints, history, examination, investigations, drugs, allergies, BP readings
 - Pharmacist stock management with low-stock alerts and expiry tracking
 - Prescription dispensing with audit trail
-- Medical terminology autocomplete (19 categories)
+- **Dynamic Unit Templates** — add custom clinic types from the admin UI (no code changes)
+- **Dynamic View Templates** — add custom clinical views from the admin UI; blade file auto-scaffolded with full developer guide
+- **Dynamic Terminology Boxes** — add custom terminology categories from the admin UI; slug immediately usable in clinical pages
+- Medical terminology autocomplete (19 built-in + unlimited custom categories)
 - Drug name master list with dose/frequency defaults
 - Clinic confirmation letters and monthly reports
 - Fully local frontend (Bootstrap 5 + Bootstrap Icons, no CDN dependency)
@@ -99,8 +101,8 @@ php artisan serve
 ### Option B — Using XAMPP (Windows)
 
 ```bash
-# Place project in C:\xampp\htdocs\openhims2
-# Then access via: http://localhost/openhims2/public
+# Place project in H:\xampp\htdocs\openhims2
+# Access via: http://localhost/openhims2/public
 
 # In .env set:
 # DB_HOST=127.0.0.1
@@ -108,7 +110,6 @@ php artisan serve
 # DB_USERNAME=root
 # DB_PASSWORD=
 
-# Then run from the project folder:
 composer install
 npm install bootstrap bootstrap-icons
 php artisan app:publish-assets
@@ -117,7 +118,7 @@ php artisan migrate:fresh --seed
 
 ### Option C — Import from database.sql
 
-If you have the exported `database.sql` file:
+The `database.sql` file in this repository contains the full schema, system seed data, and demo data.
 
 ```bash
 # 1. Create database
@@ -126,7 +127,7 @@ mysql -u root -p -e "CREATE DATABASE phims CHARACTER SET utf8mb4 COLLATE utf8mb4
 # 2. Import schema + seed data
 mysql -u root -p phims < database.sql
 
-# 3. Then run only the AdminSeeder (not migrate:fresh)
+# 3. Create the admin user
 php artisan db:seed --class=AdminSeeder
 ```
 
@@ -163,10 +164,6 @@ Fields:
 - **Parent Institution** — leave blank for top-level
 - Email, phone, address (optional)
 
-You can nest as many levels as needed. Only institutions at the lowest level (leaves) should have units attached.
-
-[![Screenshot-2026-04-21-224603.png](https://i.postimg.cc/XNQV6Zj2/Screenshot-2026-04-21-224603.png)](https://postimg.cc/BtPWxn1D)
-
 ---
 
 ### 2. Create Units
@@ -179,7 +176,7 @@ Fields:
 - **Unit Name** — e.g., `City General Clinic`
 - **Unit Number** — optional identifier
 - **Institution** — which institution this unit belongs to
-- **Unit Template** — the clinic type (see table below)
+- **Unit Template** — the clinic type
 
 | Unit Template | Code | Typical use |
 |---------------|------|-------------|
@@ -189,19 +186,15 @@ Fields:
 | General Pharmacy | GP | Pharmacy dispensing |
 | Office | OFFICE | Admin / staff |
 
+Custom unit templates (created via Admin → Unit Templates) also appear here.
 
-[![Screenshot-2026-04-21-224710.png](https://i.postimg.cc/L4NHFq9x/Screenshot-2026-04-21-224710.png)](https://postimg.cc/Lhgdz8ZP)
 ---
 
 ### 3. Create Unit Views
 
 **Admin → View Management**
 
-A **Unit View** is an instance of a role-view at a specific unit. It is the access-control bridge between a user and a unit.
-
-Example: "City General Clinic - Doctor View" is a UnitView that combines:
-- Unit: `City General Clinic`
-- View Template: `GMC - Doctor View`
+A **Unit View** is an instance of a role-view at a specific unit.
 
 **Steps:**
 1. Select the Unit
@@ -209,7 +202,7 @@ Example: "City General Clinic - Doctor View" is a UnitView that combines:
 3. Give it a name (e.g., `City General Clinic — Doctor`)
 4. Save
 
-Available View Templates per Unit Template:
+Available built-in View Templates per Unit Template:
 
 | Unit Template | Available View Templates |
 |---------------|--------------------------|
@@ -219,8 +212,8 @@ Available View Templates per Unit Template:
 | GP | Doctor View, Pharmacist View, Clerk View |
 | OFFICE | Doctor View, Nurse View, Clerk View |
 
+Custom view templates (created via Admin → View Templates) also appear here.
 
-[![Screenshot-2026-04-21-224729.png](https://i.postimg.cc/7PmxrCHm/Screenshot-2026-04-21-224729.png)](https://postimg.cc/6T4sdpGv)
 ---
 
 ### 4. Create Users & Assign Views
@@ -231,19 +224,17 @@ Fields:
 - **Name, Email, Password** — login credentials
 - **Role** — `admin` (full admin access) or `user` (clinical access)
 - **Institution** — the user's home institution
-- **Units** — which physical units this user can access (the unit selection drives which views appear)
-- **Views** — which specific Unit Views this user can see (these determine the clinical pages shown at login)
+- **Units** — which physical units this user can access
+- **Views** — which Unit Views this user can see (determines the clinical pages shown at login)
 
-**Important:** A user must have at least one View assigned to log in as clinical staff. A user with zero views will receive an error on login.
+**Important:** A clinical user must have at least one View assigned to log in.
 
 **Login behavior:**
-- 1 view assigned → lands directly on that view's clinical page
+- 1 view → lands directly on that view's clinical page
 - Multiple views → presented with a selection screen
 - Admin role → always goes to `/admin/dashboard`
 
-**AJAX-driven form:** When you pick an Institution, the Units dropdown loads automatically. When you pick Units, the Views checkboxes load automatically.
-
-[![Screenshot-2026-04-21-224805.png](https://i.postimg.cc/pVq2M9WK/Screenshot-2026-04-21-224805.png)](https://postimg.cc/Th58r3WP)
+The form is AJAX-driven: selecting an Institution auto-loads its Units; selecting Units auto-loads available Views.
 
 ---
 
@@ -253,11 +244,11 @@ Fields:
 
 #### Adding Drug Names
 
-Click **Add Drug** and type the drug name (e.g., `Metformin 500mg`). This creates an entry in the master drug list.
+Click **Add Drug** and type the drug name (e.g., `Metformin 500mg`).
 
 #### Setting Drug Defaults
 
-After adding a drug, click **Set Default** to pre-fill prescribing defaults:
+Click **Set Default** to pre-fill prescribing defaults:
 
 | Field | Options |
 |-------|---------|
@@ -267,11 +258,7 @@ After adding a drug, click **Set Default** to pre-fill prescribing defaults:
 | Frequency | mane, nocte, bd, tds, daily, EOD, SOS |
 | Duration | Number of days |
 
-When a doctor searches for this drug during a visit, these defaults auto-fill the prescription form.
-
-[![Screenshot-2026-04-21-224827.png](https://i.postimg.cc/pVq2M9W8/Screenshot-2026-04-21-224827.png)](https://postimg.cc/MXfkypjK)
-
-[![Screenshot-2026-04-21-224854.png](https://i.postimg.cc/59nxWH4L/Screenshot-2026-04-21-224854.png)](https://postimg.cc/dDZM8VTV)
+When a doctor searches for this drug, these defaults auto-fill the prescription form.
 
 ---
 
@@ -279,33 +266,44 @@ When a doctor searches for this drug during a visit, these defaults auto-fill th
 
 **Admin → Terminology**
 
-Terminology terms are grouped into **19 medical categories** used for autocomplete in doctor visit forms.
+Terminology terms provide autocomplete suggestions in clinical forms. Terms are grouped into **boxes** (categories).
 
-| Category | Used in doctor form |
-|----------|---------------------|
-| presenting_complaints | Complaints section |
-| complaint_durations | Duration of complaint |
-| past_medical_history | Past medical history |
-| past_surgical_history | Past surgical history |
-| social_history | Social history |
-| menstrual_history | Menstrual history |
-| investigations | Investigation names |
-| general_looking | Examination → General |
-| cardiology_findings | Examination → Cardiology |
-| respiratory_findings | Examination → Respiratory |
-| abdominal_findings | Examination → Abdomen |
-| neurological_findings | Examination → Neurology |
-| dermatological_findings | Examination → Dermatology |
-| differential_diagnosis | Diagnosis section |
-| working_diagnosis | Working diagnosis |
-| diabetes_instructions | Management instructions |
-| hypertension_instructions | Management instructions |
-| dyslipidemia_instructions | Management instructions |
-| general_instructions | Management instructions |
+#### Built-in boxes (19 system boxes, protected)
 
-Click **Add Term** next to a category, type the term, and save. Terms appear as autocomplete suggestions when clinical staff type in those fields.
+| Slug | Display Name |
+|------|-------------|
+| `presenting_complaints` | Presenting Complaints |
+| `complaint_durations` | Complaint Durations |
+| `past_medical_history` | Past Medical History |
+| `past_surgical_history` | Past Surgical History |
+| `social_history` | Social History |
+| `menstrual_history` | Menstrual History |
+| `investigations` | Investigations |
+| `general_looking` | General Looking |
+| `cardiology_findings` | Cardiology Examination Findings |
+| `respiratory_findings` | Respiratory Examination Findings |
+| `abdominal_findings` | Abdominal Examination Findings |
+| `neurological_findings` | Neurological Examination |
+| `dermatological_findings` | Dermatological Findings |
+| `differential_diagnosis` | Differential Diagnosis |
+| `working_diagnosis` | Working Diagnosis |
+| `diabetes_instructions` | Diabetes Instructions |
+| `hypertension_instructions` | Hypertension Instructions |
+| `dyslipidemia_instructions` | Dyslipidemia Instructions |
+| `general_instructions` | General Instructions |
 
-[![Screenshot-2026-04-21-224918.png](https://i.postimg.cc/wx06Ytq5/Screenshot-2026-04-21-224918.png)](https://postimg.cc/Z0vkr5y0)
+#### Adding terms
+
+Type in the "Add new term…" box within any category card and click Save. Terms appear instantly via AJAX.
+
+#### Adding custom terminology boxes
+
+Click **Add Custom Box** (top-right) → enter a name (slug is auto-generated) → Create Box.
+Your new box appears immediately with its slug displayed. See [Advanced: Custom Terminology Boxes](#advanced-custom-terminology-boxes) for how to wire it into a clinical page.
+
+#### Implementation Guide
+
+Click **Implementation Guide** (top-right) for ready-to-copy code snippets showing how to embed any terminology box in a clinical blade file.
 
 ---
 
@@ -313,195 +311,148 @@ Click **Add Term** next to a category, type the term, and save. Terms appear as 
 
 ### Clerk Workflow
 
-The **Clerk View** is the front-desk interface for patient registration and queue management.
-
 1. **Register a new patient**: Click `Register Patient` → fill in Name, DOB/Age, Gender, NIC, Mobile, Address → Save.
-   - The system checks for duplicates by NIC and mobile number before saving.
-2. **Add patient to queue**: From the patient list or search results, click `Add to Queue` → select visit category:
-   - **OPD** — general outpatient visit (OPD number, height, weight, BP)
-   - **New Clinic Visit** — first clinic attendance (clinic number assigned)
-   - **Recurrent Clinic Visit** — follow-up clinic attendance
+2. **Add patient to queue**: Click `Add to Queue` → select visit category:
+   - **OPD** — general outpatient (OPD number, height, weight, BP)
+   - **New Clinic Visit** — first attendance (clinic number assigned)
+   - **Recurrent Clinic Visit** — follow-up
    - **Urgent** — priority case
-3. **Monitor queue**: The queue panel shows all patients waiting, in-progress, and visited today.
-4. **Reset queue**: At end of day, use `Reset Queue` to archive the session and start fresh the next day.
-
-   [![Screenshot-2026-04-21-222812.png](https://i.postimg.cc/65qBW9T9/Screenshot-2026-04-21-222812.png)](https://postimg.cc/mhvvVWQq)
-
-   [![Screenshot-2026-04-21-222844.png](https://i.postimg.cc/pXrPW2yN/Screenshot-2026-04-21-222844.png)](https://postimg.cc/jCppvYzv)
-
-   [![Screenshot-2026-04-21-223813.png](https://i.postimg.cc/bNrqyzr7/Screenshot-2026-04-21-223813.png)](https://postimg.cc/Cd33Jpj7)
+3. **Monitor queue**: All patients waiting, in-progress, and visited today.
+4. **Reset queue**: At end of day to start fresh the next morning.
 
 ---
 
 ### Doctor Workflow
 
-The **Doctor View** shows today's queue and opens a full visit form when a patient is selected.
-
-1. **Select a patient from queue**: Click on a patient row to open the visit form.
-2. **Presenting Complaints**: Add complaints with durations using autocomplete (terminology terms).
-3. **History**: Past medical, surgical, social, and menstrual history — all with autocomplete.
-4. **Examination**:
-   - General looking, pulse rate
-   - Cardiovascular, respiratory, abdominal, neurological, dermatological findings
-5. **Investigations**: Add investigation name + result (e.g., `FBS: 6.2 mmol/L`).
-6. **Blood Pressure**: Add one or more BP readings during the visit.
-7. **Allergies**: Add patient allergies (persists across all visits for that patient).
-8. **Diagnoses**: Differential and working diagnosis with autocomplete.
-9. **Drugs**:
-   - Search drug name → defaults auto-fill → adjust dose/frequency/duration if needed
-   - Drugs are grouped by section
-   - Full audit log of additions, edits, and deletions
-10. **Management Instructions**: Free-text plus autocomplete for standard instruction bundles (diabetes, hypertension, etc.).
-11. **End Visit**: Click `End Visit` to mark the patient as visited and move them to the pharmacist queue.
-
-    [![Screenshot-2026-04-21-223849.png](https://i.postimg.cc/c4CdxsCV/Screenshot-2026-04-21-223849.png)](https://postimg.cc/Hjqq31Q2)
-
-    [![Screenshot-2026-04-21-224008.png](https://i.postimg.cc/3JN38KNb/Screenshot-2026-04-21-224008.png)](https://postimg.cc/9z661HGG)
-
-    [![Screenshot-2026-04-21-224120.png](https://i.postimg.cc/HsnTYpn6/Screenshot-2026-04-21-224120.png)](https://postimg.cc/23ssTN4W)
-
-    [![Screenshot-2026-04-21-224244.png](https://i.postimg.cc/xT89f08s/Screenshot-2026-04-21-224244.png)](https://postimg.cc/fkGG5QxX)
-
-    [![Screenshot-2026-04-21-224323.png](https://i.postimg.cc/zXvqzJvk/Screenshot-2026-04-21-224323.png)](https://postimg.cc/Dm9953qW)
-
-    [![Screenshot-2026-04-21-230631.png](https://i.postimg.cc/SsQxccQk/Screenshot-2026-04-21-230631.png)](https://postimg.cc/cKjWSg8b)
+1. **Select a patient from queue** → opens the visit form.
+2. **Presenting Complaints** — with durations, using terminology autocomplete.
+3. **History** — past medical, surgical, social, menstrual — all with autocomplete.
+4. **Examination** — general, cardiovascular, respiratory, abdominal, neurological, dermatological.
+5. **Investigations** — name + result (e.g., `FBS: 6.2 mmol/L`).
+6. **Blood Pressure** — one or more readings.
+7. **Allergies** — persists across all visits.
+8. **Diagnoses** — differential and working diagnosis.
+9. **Drugs** — search → defaults auto-fill → adjust if needed. Full audit log of changes.
+10. **Management Instructions** — free-text plus instruction bundles.
+11. **End Visit** — marks patient visited; moves to pharmacist queue.
 
 ---
 
 ### Nurse Workflow
 
-The **Nurse View** provides a read-access summary of visits.
+Read-access summary view. Nurses can:
+- View the patient list for the day
+- Open patient history (all past visits)
+- View visit summaries (notes, drugs, BP, investigations)
 
-1. View the patient list for the day
-2. Open patient history to see all past visits
-3. View visit summaries (read-only — notes, drugs, BP readings, investigations)
-
-The nurse view is primarily for monitoring and clinical handover; it does not modify clinical data.
+The nurse view does not modify clinical data.
 
 ---
 
 ### Pharmacist Workflow
 
-The **Pharmacist View** (GP units only) handles dispensing and stock management.
-
 #### Dispensing
 
-1. The queue shows patients with `visited` status (doctor has finished their assessment)
-2. Click a patient to view their full prescription
-3. For each prescribed drug, click `Dispense` → select a matching stock item → enter quantity dispensed
-4. Mark the visit as `Dispensed` when all drugs have been handled
+1. Queue shows patients with `visited` status
+2. Click patient → view full prescription
+3. For each drug: click `Dispense` → select stock item → enter quantity
+4. Mark visit as `Dispensed` when complete
 
 #### Stock Management
 
-Within the Pharmacist view:
-
-- **Add Stock**: Drug name, initial quantity, expiry date, low-stock threshold
-- **Restock**: Add quantity to existing stock (each restock is logged)
-- **Mark Out of Stock**: Toggle flag manually
-- **View Restock Log**: Full history of additions and adjustments
-
-**Alerts panel** shows:
-- Drugs expiring within 30 days
-- Drugs below the low-stock threshold
-- Drugs marked as out of stock
-
-  [![Screenshot-2026-04-21-224434.png](https://i.postimg.cc/pXrPW2rQ/Screenshot-2026-04-21-224434.png)](https://postimg.cc/9z661HGz)
-
-  [![Screenshot-2026-04-21-224508.png](https://i.postimg.cc/hPvKDSvL/Screenshot-2026-04-21-224508.png)](https://postimg.cc/WtBBScMz)
-
-  [![Screenshot-2026-04-21-224520.png](https://i.postimg.cc/59nxWH47/Screenshot-2026-04-21-224520.png)](https://postimg.cc/nM98vhQB)
+- **Add Stock**: drug name, initial quantity, expiry date, low-stock threshold
+- **Restock**: add quantity to existing stock (logged)
+- **Mark Out of Stock**: toggle manually
+- **Alerts panel**: drugs expiring ≤30 days, below threshold, or out of stock
 
 ---
 
-## Advanced: Adding New Unit Templates
+## Advanced: Custom Unit Templates
 
-A **Unit Template** defines a clinic type. The 5 built-in templates (GMC, DC, GI, GP, OFFICE) cover most use cases. To add a new one:
+Unit Templates define clinic types. The 5 built-in templates (GMC, DC, GI, GP, OFFICE) are **system-protected** and cannot be deleted. You can add your own.
 
-### Step 1 — Add to the seeder
+### Via Admin UI (recommended)
 
-In `database/seeders/UnitTemplateSeeder.php`:
+1. Go to **Admin → Unit Templates**
+2. Click **Add Unit Template**
+3. Enter a name (e.g., `Rehabilitation Hub`) and a code (e.g., `RH`) — the code is auto-uppercased
+4. Save
+
+The new template appears immediately in Unit Management when creating units.
+
+### Via Seeder (for deployments / fresh install)
+
+Add to `database/seeders/UnitTemplateSeeder.php`:
 
 ```php
 UnitTemplate::firstOrCreate(['code' => 'RH'], [
-    'name' => 'Rehabilitation Hub',
-    'code' => 'RH',
+    'name'      => 'Rehabilitation Hub',
+    'code'      => 'RH',
+    'is_system' => true,   // set true if you want it protected from UI deletion
 ]);
 ```
 
-Run:
 ```bash
 php artisan db:seed --class=UnitTemplateSeeder
 ```
 
-### Step 2 — Create View Templates for it
+---
 
-In `database/seeders/ViewTemplateSeeder.php`, add entries that reference the new template:
+## Advanced: Custom View Templates & Clinical Pages
+
+View Templates define role-based views for a Unit Template. Each template has a `blade_path` that points to a Blade file.
+
+### Via Admin UI (recommended)
+
+1. Go to **Admin → View Templates**
+2. Click **Add View Template** (or the `+ Add View` button on a specific unit template row)
+3. Fill in:
+   - **Unit Template** — which clinic type this view belongs to
+   - **View Template Name** — e.g., `RH - Physio View`
+   - **Code** — auto-generated slug (e.g., `rh-physio`)
+   - **Blade Path** — dot-notation path (e.g., `clinical.rh.physio`) — auto-suggested from the name
+4. Save
+
+**What happens automatically:**
+- The view template record is created in the database
+- The blade file is created at `resources/views/clinical/rh/physio.blade.php`
+- The blade file contains a **full Developer Starter Guide** (tabbed UI with 6 sections — see below)
+
+After creating the view template:
+- Go to **Admin → View Management** and create a Unit View linking a unit to the new template
+- Assign the Unit View to a user
+- The user can now log in and reach the new clinical page
+
+### Via Seeder (for deployments)
 
 ```php
 $rhTemplate = UnitTemplate::where('code', 'RH')->first();
 
-ViewTemplate::firstOrCreate(['code' => 'rh-doctor'], [
-    'name'             => 'RH - Doctor View',
-    'code'             => 'rh-doctor',
-    'blade_path'       => 'clinical.rh.doctor',   // → resources/views/clinical/rh/doctor.blade.php
+ViewTemplate::firstOrCreate(['code' => 'rh-physio'], [
+    'name'             => 'RH - Physio View',
+    'code'             => 'rh-physio',
+    'blade_path'       => 'clinical.rh.physio',
     'unit_template_id' => $rhTemplate->id,
+    'is_system'        => false,
 ]);
 ```
 
-Run:
-```bash
-php artisan db:seed --class=ViewTemplateSeeder
-```
+### The Developer Starter Guide
 
-### Step 3 — Create the blade files
+When a clinical user visits a newly-created view, they see a **Developer Starter Guide** — a full-page tabbed interface embedded in the blade file itself. The guide includes:
 
-Create `resources/views/clinical/rh/doctor.blade.php` (see the next section for the template structure).
+| Tab | Contents |
+|-----|----------|
+| **Getting Started** | 4-step instructions, live context values, working live examples |
+| **Starter Template** | Copy-paste ready blank clinical page with syntax highlighting |
+| **Components** | Snippets for alerts, cards, tables, forms, modals — with live preview |
+| **Search Boxes** | Live terminology and drug autocomplete demos with copyable code |
+| **Variables** | All PHP variables available in the view, with live rendered values |
+| **Backend** | How to add routes and a controller for this page |
 
-### Step 4 — Use it in Admin
+All code blocks have **copy-to-clipboard** buttons.
 
-After seeding, the new Unit Template appears in Admin → Unit Management when creating a unit. The new View Templates appear in Admin → View Management when creating Unit Views.
-
----
-
-## Advanced: Adding New View Templates
-
-A **View Template** is a named role-view for a specific Unit Template. Each has a `blade_path` (dot-notation path to the blade file).
-
-### Via Seeder (recommended)
-
-Add to `ViewTemplateSeeder.php`:
-
-```php
-ViewTemplate::firstOrCreate(['code' => 'gmc-mo'], [
-    'name'             => 'GMC - Medical Officer View',
-    'code'             => 'gmc-mo',
-    'blade_path'       => 'clinical.gmc.mo',   // → resources/views/clinical/gmc/mo.blade.php
-    'unit_template_id' => $gmcTemplate->id,
-]);
-```
-
-Then run:
-```bash
-php artisan db:seed --class=ViewTemplateSeeder
-```
-
-### Via direct SQL
-
-```sql
-INSERT INTO view_templates (name, code, blade_path, unit_template_id, created_at, updated_at)
-VALUES ('GMC - MO View', 'gmc-mo', 'clinical.gmc.mo', 1, NOW(), NOW());
-```
-
-After adding the template:
-1. Go to **Admin → View Management**
-2. Create a **Unit View** linking a physical unit to the new view template
-3. Assign the Unit View to a user
-
----
-
-## Advanced: Creating New Clinical View Pages
-
-Each clinical view is a Blade template at the path stored in `view_templates.blade_path` (dot-notation, e.g., `clinical.gmc.doctor` → `resources/views/clinical/gmc/doctor.blade.php`).
+To replace the guide with a real page, open the blade file in your editor and replace its content. The file path is shown prominently in the guide banner.
 
 ### Variables available in every clinical view
 
@@ -509,42 +460,38 @@ Each clinical view is a Blade template at the path stored in `view_templates.bla
 
 ```php
 $unitView       // UnitView model — the specific view instance the user selected
+$unit           // Unit model — has ->name, ->institution, ->unitTemplate
 $viewTemplate   // ViewTemplate model — has ->name, ->code, ->blade_path
-$unit           // Unit model — has ->name, ->unit_number, ->institution
-$institution    // Institution model — has ->name, ->code, ->address, etc.
-$user           // The currently authenticated User model
+$pageTitle      // String: "View Name — Unit Name"
+auth()->user()  // The currently authenticated User model
 ```
 
-### Minimal blade template skeleton
+### Minimal blade file skeleton
 
 ```blade
-{{-- resources/views/clinical/rh/doctor.blade.php --}}
 @extends('layouts.clinical')
-@section('title', $pageTitle ?? 'RH - Doctor View')
+@section('title', $pageTitle)
 
 @push('styles')
 <style>
-    :root { --c: #7c3aed; --c-light: #f5f3ff; --c-dark: #6d28d9; }
+    /* page-specific CSS */
 </style>
 @endpush
 
 @section('content')
 
-{{-- Role banner --}}
-<div class="p-3 mb-3 rounded-3 text-white" style="background: linear-gradient(135deg, var(--c-dark), var(--c));">
-    <div class="d-flex align-items-center gap-3">
-        <div>
-            <h5 class="mb-0 fw-bold">{{ $viewTemplate->name }}</h5>
-            <small class="opacity-75">{{ $unit->name }} · {{ $institution->name }}</small>
-        </div>
+<div class="mb-4 d-flex align-items-start justify-content-between">
+    <div>
+        <h4 class="fw-bold mb-1">{{ $pageTitle }}</h4>
+        <p class="text-muted small mb-0">
+            {{ $unit->name }} &middot; {{ $unit->institution->name ?? '' }}
+        </p>
     </div>
 </div>
 
-{{-- Your main content --}}
-<div class="card">
-    <div class="card-body">
-        <p>Logged in as {{ $user->name }}</p>
-        {{-- Patient list, queue, forms, etc. --}}
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <!-- your clinical content -->
     </div>
 </div>
 
@@ -552,89 +499,117 @@ $user           // The currently authenticated User model
 
 @push('scripts')
 <script>
-    // CSRF token for AJAX requests:
+    // page-specific JS
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 </script>
 @endpush
 ```
 
-### Reusable partials
+### Adding backend routes for a clinical page
 
-| Partial | Blade path | Purpose |
-|---------|------------|---------|
-| Patient queue | `clinical.patients._queue` | Today's waiting queue |
-| GMC queue | `clinical.gmc._queue` | GMC-styled queue with tabs |
-| Doctor queue | `clinical.doctor._queue` | Doctor's queue panel |
-| Patient visit list | `clinical.patients._visit_list` | Patient's visit history |
-| Nurse visit list | `clinical.nurse._visit_list` | Nurse-styled visit list |
+Place new routes **before** the `/{unitView}` catch-all at the bottom of the clinical group in `routes/web.php`:
 
-Include a partial:
+```php
+use App\Http\Controllers\Clinical\MyPageController;
 
-```blade
-@include('clinical.patients._queue', ['unitView' => $unitView])
+Route::get('/{unitView}/my-page',  [MyPageController::class, 'index'])->name('clinical.my-page');
+Route::post('/{unitView}/my-page', [MyPageController::class, 'store'])->name('clinical.my-page.store');
 ```
 
-### Useful route helpers inside clinical views
+```bash
+php artisan make:controller Clinical/MyPageController
+```
 
-```blade
-{{-- Register new patient --}}
-<a href="{{ route('clinical.patients.register', $unitView) }}">Register Patient</a>
+Controller boilerplate:
 
-{{-- Patient list for this unit view --}}
-<a href="{{ route('clinical.patients.list', $unitView) }}">All Patients</a>
+```php
+namespace App\Http\Controllers\Clinical;
 
-{{-- Today's queue --}}
-<a href="{{ route('clinical.patients.today-queue', $unitView) }}">Today Queue</a>
+use App\Http\Controllers\Controller;
+use App\Models\UnitView;
+use Illuminate\Http\Request;
 
-{{-- Add patient to queue (POST) --}}
-<form method="POST" action="{{ route('clinical.patients.add-to-queue', [$unitView, $patient]) }}">
-    @csrf
-</form>
+class MyPageController extends Controller
+{
+    public function index(UnitView $unitView)
+    {
+        $unit         = $unitView->unit->load('institution', 'unitTemplate');
+        $viewTemplate = $unitView->viewTemplate;
+        $pageTitle    = $viewTemplate->name . ' — ' . $unit->name;
+        $items        = MyModel::where('unit_id', $unit->id)->latest()->get();
 
-{{-- Start a doctor visit (POST) --}}
-<form method="POST" action="{{ route('clinical.doctor.start-visit', [$unitView, $visit]) }}">
-    @csrf
-</form>
+        return view('clinical.my.page', compact('unitView', 'unit', 'viewTemplate', 'pageTitle', 'items'));
+    }
 
-{{-- Doctor visit form page --}}
-<a href="{{ route('clinical.doctor.visit', [$unitView, $visit]) }}">Open Visit</a>
+    public function store(Request $request, UnitView $unitView)
+    {
+        $data = $request->validate(['notes' => 'required|string']);
+        MyModel::create($data + ['unit_id' => $unitView->unit_id]);
+        return back()->with('success', 'Saved.');
+    }
+}
 ```
 
 ---
 
-## Advanced: Adding New Terminology Categories
+## Advanced: Custom Terminology Boxes
 
-Terminology categories are defined as a static array in the model. No migration is required.
+Terminology **boxes** are named categories of terms. You can add unlimited custom boxes alongside the 19 built-in system boxes.
 
-### Step 1 — Add the category key
+### Via Admin UI (recommended)
 
-In `app/Models/TerminologyTerm.php`, add your new category to `$categories`:
+1. Go to **Admin → Terminology**
+2. Click **Add Custom Box** (top-right)
+3. Enter:
+   - **Box Name** — displayed as the section heading (e.g., `Orthopaedic Findings`)
+   - **Slug** — auto-generated from the name (e.g., `orthopaedic_findings`); this is the value you use as `data-category` in HTML
+   - **Description** — optional note about what the box is for
+4. Save
 
-```php
-public static array $categories = [
-    'presenting_complaints',
-    'complaint_durations',
-    // ... existing categories ...
-    'ophthalmology_findings',   // ← add here
-];
+The new box appears at the bottom of the terminology management page. Add terms to it immediately.
+
+### Deleting a custom box
+
+A custom box can only be deleted when it has no terms. Delete all terms first, then use the trash icon in the box header.
+
+System boxes (the original 19) are protected and cannot be deleted.
+
+### Using the slug in a clinical page
+
+Once you have a custom box with slug `orthopaedic_findings`, add this HTML to any clinical blade file:
+
+```html
+<input type="text"
+       class="form-control terminology-search"
+       data-category="orthopaedic_findings"
+       name="ortho_findings"
+       placeholder="Type a finding...">
 ```
 
-### Step 2 — The Admin UI picks it up automatically
+The autocomplete is wired up automatically — no JavaScript needed.
 
-Admin → Terminology will now show your new category with an "Add Term" button. No further changes needed.
+The **Implementation Guide** button at the top-right of the Terminology Management page shows all slugs with copy buttons and ready-to-paste code examples.
 
-### Step 3 — Optionally seed default terms
+### Via Seeder (for deployments)
 
 ```php
-// database/seeders/TerminologySeeder.php (create if not exists)
-$terms = [
-    ['category' => 'ophthalmology_findings', 'term' => 'Normal fundus'],
-    ['category' => 'ophthalmology_findings', 'term' => 'Diabetic retinopathy'],
-    ['category' => 'ophthalmology_findings', 'term' => 'Hypertensive retinopathy'],
-];
+use App\Models\TerminologyCategory;
+use App\Models\TerminologyTerm;
 
+TerminologyCategory::firstOrCreate(['slug' => 'orthopaedic_findings'], [
+    'name'        => 'Orthopaedic Findings',
+    'slug'        => 'orthopaedic_findings',
+    'description' => 'Musculoskeletal examination findings',
+    'is_system'   => false,
+    'sort_order'  => 100,
+]);
+
+$terms = ['Normal range of motion', 'Limited flexion', 'Joint effusion', 'Crepitus'];
 foreach ($terms as $term) {
-    TerminologyTerm::firstOrCreate($term);
+    TerminologyTerm::firstOrCreate([
+        'category' => 'orthopaedic_findings',
+        'term'     => $term,
+    ]);
 }
 ```
 
@@ -642,60 +617,76 @@ foreach ($terms as $term) {
 
 ## Advanced: Using Terminology in Blade Views
 
-### The search endpoint
-
-```
-GET /terminology/search?category=presenting_complaints&q=fever
-Authorization: Any authenticated user (auth middleware)
-Response: ["Fever", "Fever with chills", "Fever and headache"]
-```
-
-### Full HTML + JS pattern
-
-This is the exact pattern used in the existing doctor views. Copy and adapt it:
+### Simple autocomplete input
 
 ```html
-<!-- Tag input container -->
+<!-- Search across all terms in a category -->
+<input type="text"
+       class="form-control terminology-search"
+       data-category="presenting_complaints"
+       name="complaint"
+       placeholder="Start typing...">
+```
+
+The `terminology-search` class is wired globally by the clinical layout. Multiple inputs on the same page all work independently.
+
+### AJAX call from JavaScript
+
+```javascript
+fetch(`/terminology/search?category=presenting_complaints&q=${encodeURIComponent(query)}`)
+    .then(r => r.json())
+    .then(terms => {
+        // terms = ["Headache", "Chest pain", "Fever", ...]
+    });
+```
+
+### Search endpoint reference
+
+```
+GET /terminology/search?category={slug}&q={query}
+
+Auth:     Any authenticated user (admin or clinical)
+Params:   category — required, must be a valid slug
+          q        — optional search string (partial match)
+Response: JSON array of strings e.g. ["Headache", "Chest pain"]
+```
+
+### Tag-input pattern (multiple selections)
+
+This is the pattern used in the GMC Doctor view for multi-select terminology fields:
+
+```html
 <div class="position-relative">
-    <input
-        type="text"
-        class="form-control terminology-ac"
-        data-category="ophthalmology_findings"
-        placeholder="Type to search findings..."
-        autocomplete="off"
-    >
-    <!-- Autocomplete dropdown (injected by JS) -->
-    <ul class="list-group position-absolute w-100 shadow-sm z-3" id="ophthal-suggestions"
-        style="display:none; max-height:200px; overflow-y:auto;"></ul>
+    <input type="text"
+           class="form-control terminology-ac"
+           data-category="presenting_complaints"
+           placeholder="Type to search..."
+           autocomplete="off">
+    <ul class="list-group position-absolute w-100 shadow-sm"
+        id="complaints-suggestions"
+        style="display:none; max-height:200px; overflow-y:auto; z-index:10;"></ul>
 </div>
-
-<!-- Committed tags display -->
-<div id="ophthal-tags" class="d-flex flex-wrap gap-1 mt-2"></div>
-
-<!-- Hidden field — stores JSON array submitted with the form -->
-<input type="hidden" name="ophthalmology_findings" id="ophthal-hidden" value="[]">
+<div id="complaints-tags" class="d-flex flex-wrap gap-1 mt-2"></div>
+<input type="hidden" name="presenting_complaints" id="complaints-hidden" value="[]">
 ```
 
 ```javascript
-// Attach to all terminology autocomplete inputs
 document.querySelectorAll('.terminology-ac').forEach(input => {
     const category    = input.dataset.category;
-    const suggestBox  = document.getElementById(input.dataset.suggestId ?? category + '-suggestions');
-    const tagsBox     = document.getElementById(input.dataset.tagsId ?? category + '-tags');
-    const hiddenField = document.getElementById(input.dataset.hiddenId ?? category + '-hidden');
-
-    let selected = JSON.parse(hiddenField.value || '[]');
+    const suggestBox  = document.getElementById(category + '-suggestions');
+    const tagsBox     = document.getElementById(category + '-tags');
+    const hiddenField = document.getElementById(category + '-hidden');
+    let selected      = JSON.parse(hiddenField.value || '[]');
 
     function renderTags() {
         tagsBox.innerHTML = selected.map((t, i) =>
             `<span class="badge bg-primary d-flex align-items-center gap-1">
                 ${t}
                 <button type="button" class="btn-close btn-close-white btn-sm"
-                    data-index="${i}" style="font-size:.6rem;"></button>
+                        data-index="${i}" style="font-size:.6rem;"></button>
             </span>`
         ).join('');
         hiddenField.value = JSON.stringify(selected);
-
         tagsBox.querySelectorAll('.btn-close').forEach(btn => {
             btn.addEventListener('click', () => {
                 selected.splice(parseInt(btn.dataset.index), 1);
@@ -708,126 +699,94 @@ document.querySelectorAll('.terminology-ac').forEach(input => {
     input.addEventListener('input', function () {
         clearTimeout(timer);
         const q = this.value.trim();
-        if (q.length < 1) { suggestBox.style.display = 'none'; return; }
+        if (!q) { suggestBox.style.display = 'none'; return; }
 
         timer = setTimeout(() => {
-            fetch(`/terminology/search?category=${category}&q=${encodeURIComponent(q)}`, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(r => r.json())
-            .then(terms => {
-                suggestBox.innerHTML = terms
-                    .filter(t => !selected.includes(t))
-                    .map(t => `<li class="list-group-item list-group-item-action py-1 px-2"
-                                   style="cursor:pointer;">${t}</li>`)
-                    .join('') || '<li class="list-group-item py-1 px-2 text-muted">No results</li>';
-
-                suggestBox.style.display = 'block';
-
-                suggestBox.querySelectorAll('li:not(.text-muted)').forEach(li => {
-                    li.addEventListener('click', () => {
-                        selected.push(li.textContent.trim());
-                        renderTags();
-                        input.value = '';
-                        suggestBox.style.display = 'none';
+            fetch(`/terminology/search?category=${category}&q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(terms => {
+                    suggestBox.innerHTML = terms
+                        .filter(t => !selected.includes(t))
+                        .map(t => `<li class="list-group-item list-group-item-action py-1 px-2"
+                                       style="cursor:pointer">${t}</li>`)
+                        .join('') || '<li class="list-group-item py-1 px-2 text-muted">No results</li>';
+                    suggestBox.style.display = 'block';
+                    suggestBox.querySelectorAll('li:not(.text-muted)').forEach(li => {
+                        li.addEventListener('click', () => {
+                            selected.push(li.textContent.trim());
+                            renderTags();
+                            input.value = '';
+                            suggestBox.style.display = 'none';
+                        });
                     });
                 });
-            });
         }, 200);
     });
 
     document.addEventListener('click', e => {
-        if (!input.contains(e.target) && !suggestBox.contains(e.target)) {
+        if (!input.contains(e.target) && !suggestBox.contains(e.target))
             suggestBox.style.display = 'none';
-        }
     });
 
-    renderTags(); // render existing values on page load
+    renderTags();
 });
 ```
 
-### Saving terminology data in a controller
+### Saving multi-select terminology in a controller
+
+The hidden input submits a JSON string. Cast the field to `array` in the model:
 
 ```php
-// In your controller (e.g., DoctorController::saveNotes)
+// app/Models/VisitNote.php
+protected $casts = [
+    'presenting_complaints' => 'array',
+    // add your custom field here:
+    'orthopaedic_findings'  => 'array',
+];
+```
+
+```php
+// In your controller store() / update():
 $visit->note()->updateOrCreate(
     ['visit_id' => $visit->id],
-    [
-        'ophthalmology_findings' => $request->input('ophthalmology_findings', []),
-        // The input arrives as a JSON string from the hidden field;
-        // Laravel's json cast in the model handles decode automatically.
-    ]
+    ['orthopaedic_findings' => $request->input('orthopaedic_findings', [])]
 );
 ```
 
-### Adding a new JSON field to visit_notes
+```blade
+{{-- Reading in blade --}}
+@foreach($visit->note->orthopaedic_findings ?? [] as $finding)
+    <span class="badge bg-light text-dark border">{{ $finding }}</span>
+@endforeach
+```
 
-1. Create a migration:
+### Adding a new JSON column to visit_notes
 
 ```bash
-php artisan make:migration add_ophthalmology_findings_to_visit_notes_table
+php artisan make:migration add_orthopaedic_findings_to_visit_notes_table
 ```
 
 ```php
-// In the migration up() method:
-$table->json('ophthalmology_findings')->nullable()->after('dermatological_findings');
+// In the migration up():
+$table->json('orthopaedic_findings')->nullable()->after('dermatological_findings');
 ```
-
-2. Add to `VisitNote` model (`app/Models/VisitNote.php`):
-
-```php
-protected $fillable = [
-    // ... existing fields ...
-    'ophthalmology_findings',
-];
-
-protected $casts = [
-    // ... existing casts ...
-    'ophthalmology_findings' => 'array',
-];
-```
-
-3. Run the migration:
 
 ```bash
 php artisan migrate
 ```
 
-### Reading saved terminology data
-
-```php
-$note = $visit->note;
-
-// Returns an array: ["Normal fundus", "Diabetic retinopathy"]
-$findings = $note->ophthalmology_findings ?? [];
-
-foreach ($findings as $finding) {
-    echo $finding;
-}
-```
-
-In a blade view:
-
-```blade
-@if($visit->note && $visit->note->ophthalmology_findings)
-    <ul>
-        @foreach($visit->note->ophthalmology_findings as $finding)
-            <li>{{ $finding }}</li>
-        @endforeach
-    </ul>
-@endif
-```
+Then add `'orthopaedic_findings'` to `$fillable` and `$casts` in `app/Models/VisitNote.php`.
 
 ---
 
 ## Database Schema
 
-The file `database.sql` in this repository contains the full table structure and required seed data for `unit_templates` and `view_templates`.
+The file `database.sql` contains the complete schema, system seed data (unit/view/terminology templates), and demo patient data.
 
 ### Quick import
 
 ```bash
-mysql -u root -p -e "CREATE DATABASE phims;"
+mysql -u root -p -e "CREATE DATABASE phims CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -u root -p phims < database.sql
 php artisan db:seed --class=AdminSeeder
 ```
@@ -840,16 +799,19 @@ institutions (id, name, parent_id, code, email, phone, address)
             └── unit_views (id, name, unit_id, view_template_id)
                     └── [pivot] user_views (user_id, unit_view_id)
 
-unit_templates (id, name, code)                              ← seeded, static
-    └── view_templates (id, name, code, blade_path, unit_template_id)  ← seeded, static
+unit_templates (id, name, code, is_system)
+    └── view_templates (id, name, code, blade_path, unit_template_id, is_system)
 
 users (id, name, email, role, institution_id, ...)
     ├── [pivot] user_units (user_id, unit_id)
     └── [pivot] user_views (user_id, unit_view_id)
 
+terminology_categories (id, name, slug, description, is_system, sort_order)
+    └── terminology_terms (id, category [→slug], term)
+
 patients (id, name, dob, nic, mobile, phn, address)
     ├── patient_allergies (id, patient_id, allergen)
-    └── clinic_visits (id, patient_id, unit_id, visit_date, category, status)
+    └── clinic_visits (id, patient_id, unit_id, visit_date, category, status, ...)
             ├── visit_notes (id, visit_id, presenting_complaints JSON, ...)
             ├── blood_pressure_readings (id, visit_id, systolic, diastolic)
             ├── investigations (id, visit_id, name, value)
@@ -862,14 +824,21 @@ drug_names (id, name)
 
 pharmacy_stock (id, unit_view_id, drug_name, remaining, expiry_date, threshold)
     └── pharmacy_restock_logs (id, stock_id, action, amount, performed_by)
-
-terminology_terms (id, category, term)
 ```
+
+### is_system flag
+
+`unit_templates`, `view_templates`, and `terminology_categories` all have an `is_system` boolean column.
+
+| `is_system` | Meaning |
+|-------------|---------|
+| `true` | Seeded by the system; protected from deletion in the admin UI |
+| `false` | Created via the admin UI; can be deleted when no longer in use |
 
 ### Visit categories
 
-| Category value | Description |
-|----------------|-------------|
+| Value | Description |
+|-------|-------------|
 | `opd` | General OPD visit |
 | `new_clinic_visit` | First clinic attendance |
 | `recurrent_clinic_visit` | Follow-up clinic visit |
@@ -877,8 +846,8 @@ terminology_terms (id, category, term)
 
 ### Visit statuses
 
-| Status | Meaning |
-|--------|---------|
+| Value | Meaning |
+|-------|---------|
 | `waiting` | In queue, not yet seen |
 | `in_progress` | Currently with doctor |
 | `visited` | Doctor done, awaiting pharmacy |
@@ -898,6 +867,7 @@ OpenHIMS2 is open-source software licensed under the [MIT License](LICENSE).
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 When contributing a new clinical view template:
-1. Add a seeder entry in `ViewTemplateSeeder.php`
-2. Create the blade file under `resources/views/clinical/`
-3. Update this README with the new template details
+1. Use Admin → View Templates to create it (blade file is auto-scaffolded)
+2. Replace the developer guide content in the blade file with your clinical page
+3. Optionally add it to `ViewTemplateSeeder.php` for reproducible deployments
+4. Update this README with the new template details

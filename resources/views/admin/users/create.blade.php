@@ -118,7 +118,7 @@ function loadUnits(institutionId) {
         return;
     }
     fetch(`{{ url('admin/users/units-for-institution') }}/${institutionId}`)
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(units => {
             if (!units.length) {
                 unitsContainer.innerHTML = '<span class="text-muted small">No units in this institution.</span>';
@@ -139,6 +139,10 @@ function loadUnits(institutionId) {
             unitsSection.style.display = 'block';
             document.querySelectorAll('.unit-cb').forEach(cb => cb.addEventListener('change', loadViews));
             loadViews();
+        })
+        .catch(() => {
+            unitsContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-exclamation-triangle me-1"></i>Failed to load units. Please refresh.</span>';
+            unitsSection.style.display = 'block';
         });
 }
 
@@ -150,10 +154,10 @@ function loadViews() {
     checked.forEach(id => params.append('unit_ids[]', id));
 
     fetch(`{{ route('admin.users.views-for-units') }}?${params}`)
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(views => {
             if (!views.length) {
-                viewsContainer.innerHTML = '<span class="text-muted small">No views for selected units.</span>';
+                viewsContainer.innerHTML = '<span class="text-muted small">No views configured for selected units. Go to Views Management to add views.</span>';
                 viewsSection.style.display = 'block';
                 return;
             }
@@ -168,10 +172,14 @@ function loadViews() {
                 </div>`
             ).join('');
             viewsSection.style.display = 'block';
+        })
+        .catch(() => {
+            viewsContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-exclamation-triangle me-1"></i>Failed to load views. Please refresh.</span>';
+            viewsSection.style.display = 'block';
         });
 }
 
-// Init
+// Init: if institution already selected (e.g. after form validation error), load its units
 if (institutionSelect.value) loadUnits(institutionSelect.value);
 </script>
 @endpush

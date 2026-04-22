@@ -30,6 +30,10 @@ class DashboardController extends Controller
         $viewTemplate = $unitView->viewTemplate;
         $pageTitle    = $viewTemplate->name . ' — ' . $unit->name;
 
+        if (!view()->exists($viewTemplate->blade_path)) {
+            return view('clinical.new-page-guide', compact('unitView', 'unit', 'viewTemplate', 'pageTitle'));
+        }
+
         return view($viewTemplate->blade_path, compact('unitView', 'unit', 'viewTemplate', 'pageTitle'));
     }
 }

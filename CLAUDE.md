@@ -81,7 +81,6 @@ users          (standard + role, institution_id)
 ### Frontend
 
 All CSS/JS served from **local files** in `public/vendor/bootstrap/` and `public/vendor/bootstrap-icons/`. No Vite build. Re-run `php artisan app:publish-assets` to update after `npm install`.
-.
 
 ### Static Seed Data
 

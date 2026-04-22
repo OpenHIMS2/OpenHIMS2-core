@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             UnitTemplateSeeder::class,
             ViewTemplateSeeder::class,
             AdminSeeder::class,
+            TerminologyCategorySeeder::class,
         ]);
     }
 }

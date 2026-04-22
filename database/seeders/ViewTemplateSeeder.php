@@ -45,7 +45,7 @@ class ViewTemplateSeeder extends Seeder
             foreach ($views as $view) {
                 ViewTemplate::firstOrCreate(
                     ['code' => $view['code']],
-                    array_merge($view, ['unit_template_id' => $unitTemplate->id])
+                    array_merge($view, ['unit_template_id' => $unitTemplate->id, 'is_system' => true])
                 );
             }
         }

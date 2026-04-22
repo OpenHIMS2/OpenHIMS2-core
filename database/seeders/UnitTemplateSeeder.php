@@ -18,7 +18,10 @@ class UnitTemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $template) {
-            UnitTemplate::firstOrCreate(['code' => $template['code']], $template);
+            UnitTemplate::firstOrCreate(
+                ['code' => $template['code']],
+                array_merge($template, ['is_system' => true])
+            );
         }
     }
 }

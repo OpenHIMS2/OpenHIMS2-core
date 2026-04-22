@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\TerminologyCategory;
 use App\Models\TerminologyTerm;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,20 +12,22 @@ class TerminologyController extends Controller
 {
     public function index()
     {
-        $terms = TerminologyTerm::orderBy('term')
-            ->get()
-            ->groupBy('category');
+        $categories = TerminologyCategory::withCount('terms')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.terminology.index', [
-            'terms'      => $terms,
-            'categories' => TerminologyTerm::$categories,
-        ]);
+        $terms = TerminologyTerm::orderBy('term')->get()->groupBy('category');
+
+        return view('admin.terminology.index', compact('categories', 'terms'));
     }
 
     public function store(Request $request)
     {
+        $validSlugs = TerminologyCategory::pluck('slug')->toArray();
+
         $request->validate([
-            'category' => ['required', 'string', Rule::in(array_keys(TerminologyTerm::$categories))],
+            'category' => ['required', 'string', Rule::in($validSlugs)],
             'term'     => 'required|string|max:255',
         ]);
 
@@ -54,17 +57,58 @@ class TerminologyController extends Controller
     {
         $terminologyTerm->delete();
 
+        if (request()->expectsJson()) {
+            return response()->json(['ok' => true]);
+        }
+
         return back()->with('success', 'Term deleted.');
     }
 
+    public function storeCategory(Request $request)
+    {
+        $data = $request->validate([
+            'name'        => 'required|string|max:100',
+            'slug'        => ['required', 'string', 'max:50', 'regex:/^[a-z][a-z0-9_]*$/', 'unique:terminology_categories,slug'],
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $maxOrder = TerminologyCategory::max('sort_order') ?? 0;
+
+        TerminologyCategory::create([
+            'name'        => $data['name'],
+            'slug'        => $data['slug'],
+            'description' => $data['description'] ?? null,
+            'is_system'   => false,
+            'sort_order'  => $maxOrder + 1,
+        ]);
+
+        return back()->with('success', 'Terminology box "' . $data['name'] . '" created.');
+    }
+
+    public function destroyCategory(TerminologyCategory $terminologyCategory)
+    {
+        if ($terminologyCategory->is_system) {
+            return back()->with('error', 'System terminology boxes cannot be deleted.');
+        }
+
+        if ($terminologyCategory->terms()->exists()) {
+            return back()->with('error', 'Cannot delete "' . $terminologyCategory->name . '" — delete all its terms first.');
+        }
+
+        $terminologyCategory->delete();
+
+        return back()->with('success', 'Terminology box "' . $terminologyCategory->name . '" deleted.');
+    }
+
     /**
-     * JSON search endpoint — used by clinical autocomplete (auth middleware).
-     * GET /terminology/search?category=presenting_complaints&q=cough
+     * JSON autocomplete — GET /terminology/search?category=slug&q=text
      */
     public function search(Request $request)
     {
+        $validSlugs = TerminologyCategory::pluck('slug')->toArray();
+
         $request->validate([
-            'category' => ['required', Rule::in(array_keys(TerminologyTerm::$categories))],
+            'category' => ['required', Rule::in($validSlugs)],
             'q'        => 'nullable|string|max:100',
         ]);
 
