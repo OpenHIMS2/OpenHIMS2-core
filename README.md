@@ -164,6 +164,8 @@ Fields:
 - **Parent Institution** — leave blank for top-level
 - Email, phone, address (optional)
 
+  [![Screenshot-2026-04-28-111526.png](https://i.postimg.cc/4dF1dsqK/Screenshot-2026-04-28-111526.png)](https://postimg.cc/jwPf30sK)
+
 ---
 
 ### 2. Create Units
@@ -187,6 +189,7 @@ Fields:
 | Office | OFFICE | Admin / staff |
 
 Custom unit templates (created via Admin → Unit Templates) also appear here.
+[![Screenshot-2026-04-28-111621.png](https://i.postimg.cc/k4hy4qzq/Screenshot-2026-04-28-111621.png)](https://postimg.cc/KkBTpSmH)
 
 ---
 
@@ -213,6 +216,7 @@ Available built-in View Templates per Unit Template:
 | OFFICE | Doctor View, Nurse View, Clerk View |
 
 Custom view templates (created via Admin → View Templates) also appear here.
+[![Screenshot-2026-04-28-111636-Copy.png](https://i.postimg.cc/mDrwBtXG/Screenshot-2026-04-28-111636-Copy.png)](https://postimg.cc/d7zd9tcW)
 
 ---
 
@@ -235,6 +239,7 @@ Fields:
 - Admin role → always goes to `/admin/dashboard`
 
 The form is AJAX-driven: selecting an Institution auto-loads its Units; selecting Units auto-loads available Views.
+[![Screenshot-2026-04-21-224805.png](https://i.postimg.cc/MTrYTqNM/Screenshot-2026-04-21-224805.png)](https://postimg.cc/CBk8rTFS)
 
 ---
 
@@ -259,6 +264,7 @@ Click **Set Default** to pre-fill prescribing defaults:
 | Duration | Number of days |
 
 When a doctor searches for this drug, these defaults auto-fill the prescription form.
+[![Screenshot-2026-04-28-111709.png](https://i.postimg.cc/vBSvBbjk/Screenshot-2026-04-28-111709.png)](https://postimg.cc/7G0zt8qn)
 
 ---
 
@@ -305,6 +311,8 @@ Your new box appears immediately with its slug displayed. See [Advanced: Custom 
 
 Click **Implementation Guide** (top-right) for ready-to-copy code snippets showing how to embed any terminology box in a clinical blade file.
 
+[![Screenshot-2026-04-28-111743-Copy-Copy-Copy.png](https://i.postimg.cc/j5kh5t91/Screenshot-2026-04-28-111743-Copy-Copy-Copy.png)](https://postimg.cc/S2C91FmL)
+
 ---
 
 ## Daily Clinical Use
@@ -319,6 +327,10 @@ Click **Implementation Guide** (top-right) for ready-to-copy code snippets showi
    - **Urgent** — priority case
 3. **Monitor queue**: All patients waiting, in-progress, and visited today.
 4. **Reset queue**: At end of day to start fresh the next morning.
+
+   [![Screenshot-2026-04-21-222812.png](https://i.postimg.cc/qqPXsQpj/Screenshot-2026-04-21-222812.png)](https://postimg.cc/5QmC1BYC)
+   [![Screenshot-2026-04-21-222844.png](https://i.postimg.cc/4yDb6wXP/Screenshot-2026-04-21-222844.png)](https://postimg.cc/dZ9yv2kZ)
+   [![Screenshot-2026-04-21-223813.png](https://i.postimg.cc/d3bm2nJB/Screenshot-2026-04-21-223813.png)](https://postimg.cc/T5cDGVLL)
 
 ---
 
@@ -335,6 +347,22 @@ Click **Implementation Guide** (top-right) for ready-to-copy code snippets showi
 9. **Drugs** — search → defaults auto-fill → adjust if needed. Full audit log of changes.
 10. **Management Instructions** — free-text plus instruction bundles.
 11. **End Visit** — marks patient visited; moves to pharmacist queue.
+
+    [![Screenshot-2026-04-21-223849.png](https://i.postimg.cc/ZnGF8jJL/Screenshot-2026-04-21-223849.png)](https://postimg.cc/YLxWk6G4)
+
+    [![Screenshot-2026-04-21-223922.png](https://i.postimg.cc/prwYfkPf/Screenshot-2026-04-21-223922.png)](https://postimg.cc/rR9rc10s)
+
+    [![Screenshot-2026-04-21-224008.png](https://i.postimg.cc/rs0NR72j/Screenshot-2026-04-21-224008.png)](https://postimg.cc/5QJCZ70Q)
+
+    [![Screenshot-2026-04-21-224120.png](https://i.postimg.cc/ZnBxvXzc/Screenshot-2026-04-21-224120.png)](https://postimg.cc/Zvmd17RB)
+
+    [![Screenshot-2026-04-21-224141.png](https://i.postimg.cc/C5Bsn9p4/Screenshot-2026-04-21-224141.png)](https://postimg.cc/vxyVpqB1)
+
+    [![Screenshot-2026-04-21-224244.png](https://i.postimg.cc/fytfS1Q7/Screenshot-2026-04-21-224244.png)](https://postimg.cc/BP3KdY6t)
+
+    [![Screenshot-2026-04-21-224323.png](https://i.postimg.cc/qqhx6WH8/Screenshot-2026-04-21-224323.png)](https://postimg.cc/LgS1rCXX)
+
+    [![Screenshot-2026-04-21-224403.png](https://i.postimg.cc/gjXHL1bX/Screenshot-2026-04-21-224403.png)](https://postimg.cc/8fG6qK5N)
 
 ---
 
@@ -364,6 +392,12 @@ The nurse view does not modify clinical data.
 - **Restock**: add quantity to existing stock (logged)
 - **Mark Out of Stock**: toggle manually
 - **Alerts panel**: drugs expiring ≤30 days, below threshold, or out of stock
+
+  [![Screenshot-2026-04-21-224434.png](https://i.postimg.cc/wMyQRnYt/Screenshot-2026-04-21-224434.png)](https://postimg.cc/64KvDj3w)
+
+  [![Screenshot-2026-04-21-224508.png](https://i.postimg.cc/brD9S4fs/Screenshot-2026-04-21-224508.png)](https://postimg.cc/N2tHWJMc)
+
+  
 
 ---
 
